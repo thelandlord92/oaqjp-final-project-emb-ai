@@ -25,25 +25,35 @@ def emotion_detector(text_to_analyze):
     # Parsing the JSON response from the API
     response_json = json.loads(response.text)
 
-    # Get the emotion dictionary
-    emotion_dict = response_json["emotionPredictions"][0]["emotion"]
+    if response.status_code == 200:
+        # Get the emotion dictionary
+        emotion_dict = response_json["emotionPredictions"][0]["emotion"]
 
-    # Sort the emotions based on the scores to find the highest value
-    emotion_list = []
-    # Switch the position of the keys and values to (value, key)
-    for key, value in emotion_dict.items():
-        tup = (value, key)
-        emotion_list.append(tup)
-    sorted_emotion_list = sorted(emotion_list, reverse=True)
+        # Sort the emotions based on the scores to find the highest value
+        emotion_list = []
+        # Switch the position of the keys and values to (value, key)
+        for key, value in emotion_dict.items():
+            tup = (value, key)
+            emotion_list.append(tup)
+        sorted_emotion_list = sorted(emotion_list, reverse=True)
 
-    # Created a formatted dictionary of the emotions
-    formatted_emotion_dict = {
-        "anger": emotion_dict["anger"],
-        "disgust": emotion_dict["disgust"],
-        "fear": emotion_dict["fear"],
-        "joy": emotion_dict["joy"],
-        "sadness": emotion_dict["sadness"],
-        "dominant_emotion": sorted_emotion_list[0][1]
-    }
+        # Create a formatted dictionary of the emotions
+        formatted_emotion_dict = {
+            "anger": emotion_dict["anger"],
+            "disgust": emotion_dict["disgust"],
+            "fear": emotion_dict["fear"],
+            "joy": emotion_dict["joy"],
+            "sadness": emotion_dict["sadness"],
+            "dominant_emotion": sorted_emotion_list[0][1]
+        }
+    elif response.status_code == 400:
+        formatted_emotion_dict = {
+            "anger": None,
+            "disgust": None,
+            "fear": None,
+            "joy": None,
+            "sadness": None,
+            "dominant_emotion": None
+        }
 
     return formatted_emotion_dict

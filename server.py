@@ -20,11 +20,14 @@ def emo_detector():
     sadness = response["sadness"]
 
     # Format the response for the client
-    formatted_response = f"For the given statement, the "\
-        f"system response is 'anger': {anger}, 'disgust': "\
-        f"{disgust}, 'fear': {fear}, 'joy': {joy} and "\
-        f"'sadness': {sadness}. The dominant emotion is "\
-        f"{response['dominant_emotion']}." 
+    if response["dominant_emotion"] == None:
+        return "Invalid text! Please try again!."
+    else:
+        formatted_response = f"For the given statement, the "\
+            f"system response is 'anger': {anger}, 'disgust': "\
+            f"{disgust}, 'fear': {fear}, 'joy': {joy} and "\
+            f"'sadness': {sadness}. The dominant emotion is "\
+            f"{response['dominant_emotion']}." 
 
     return formatted_response
 
