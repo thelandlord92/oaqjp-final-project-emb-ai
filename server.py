@@ -1,39 +1,51 @@
+"""
+Flask app for emotion detection.
+
+Exposes:
+- /emotionDetector?textToAnalyze=...
+- /
+"""
+
+from __future__ import annotations
+
 from flask import Flask, render_template, request
+
 from EmotionDetection.emotion_detection import emotion_detector
 
-# Create an app instance
-app = Flask("Emotion Detector")
+app = Flask(__name__)
+
 
 @app.route("/emotionDetector")
-def emo_detector():
-    # Retrieve the text to analyze from the request arguments
-    text_to_analyze = request.args.get('textToAnalyze')
+def emotion_detector_route() -> str:
+    """Analyze the provided text and return emotion scores plus the dominant one."""
+    text_to_analyze = request.args.get("textToAnalyze", "", type=str).strip()
 
-    # Pass the text to the emotion detector function and store the response
+    if not text_to_analyze:
+        return "Invalid text! Please try again!."
+
     response = emotion_detector(text_to_analyze)
 
-    # Extract the emotion values from the response dictionary
-    anger = response["anger"]
-    disgust = response["disgust"]
-    fear = response["fear"]
-    joy = response["joy"]
-    sadness = response["sadness"]
-
-    # Format the response for the client
-    if response["dominant_emotion"] == None:
+    dominant = response.get("dominant_emotion")
+    if dominant is None:
         return "Invalid text! Please try again!."
-    else:
-        formatted_response = f"For the given statement, the "\
-            f"system response is 'anger': {anger}, 'disgust': "\
-            f"{disgust}, 'fear': {fear}, 'joy': {joy} and "\
-            f"'sadness': {sadness}. The dominant emotion is "\
-            f"{response['dominant_emotion']}." 
 
+    formatted_response = (
+        "For the given statement, the system response is "
+        f"'anger': {response.get('anger')}, "
+        f"'disgust': {response.get('disgust')}, "
+        f"'fear': {response.get('fear')}, "
+        f"'joy': {response.get('joy')} and "
+        f"'sadness': {response.get('sadness')}. "
+        f"The dominant emotion is {dominant}."
+    )
     return formatted_response
 
+
 @app.route("/")
-def render_index_page():
-    return render_template('index.html')
+def render_index_page() -> str:
+    """Render the index page."""
+    return render_template("index.html")
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
